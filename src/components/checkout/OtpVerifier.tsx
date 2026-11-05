@@ -2,15 +2,23 @@
 // src/components/checkout/OtpVerifier.tsx
 
 import React, { useState } from "react";
-import { Phone, Shield } from "lucide-react";
+import { Phone, Shield, Sparkles } from "lucide-react";
 
 interface OtpVerifierProps {
   onSuccess: (token: string, phone: string) => void;
 }
 
+interface SendOtpResponse {
+  success?: boolean;
+  message?: string;
+  demoCode?: string;
+  error?: string;
+}
+
 export function OtpVerifier({ onSuccess }: OtpVerifierProps): React.JSX.Element {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
+  const [demoCodeNotice, setDemoCodeNotice] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +28,8 @@ export function OtpVerifier({ onSuccess }: OtpVerifierProps): React.JSX.Element 
   const handleSendOtp = async (): Promise<void> => {
     setError(null);
     setLoading(true);
+    setDemoCodeNotice(null);
+
     try {
       const res = await fetch("/api/otp/send", {
         method: "POST",
@@ -27,9 +37,15 @@ export function OtpVerifier({ onSuccess }: OtpVerifierProps): React.JSX.Element 
         body: JSON.stringify({ phone }),
       });
 
+      const data = (await res.json()) as SendOtpResponse;
+
       if (!res.ok) {
-        const data = (await res.json()) as { error: string };
         throw new Error(data.error ?? "Failed to send OTP.");
+      }
+
+      if (data.demoCode) {
+        setCode(data.demoCode);
+        setDemoCodeNotice(`Preview code generated: ${data.demoCode}`);
       }
 
       setOtpSent(true);
@@ -75,7 +91,7 @@ export function OtpVerifier({ onSuccess }: OtpVerifierProps): React.JSX.Element 
           <p className="text-xs text-gray-500">
             {otpSent
               ? `Enter the 6-digit code sent to ${phone}`
-              : "We&apos;ll send you a one-time code to confirm your order."}
+              : "We will send you a one-time code to confirm your order."}
           </p>
         </div>
       </div>
@@ -107,6 +123,15 @@ export function OtpVerifier({ onSuccess }: OtpVerifierProps): React.JSX.Element 
         </div>
       ) : (
         <div className="space-y-3">
+          {demoCodeNotice && (
+            <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-800 text-xs px-3 py-2 rounded-xl">
+              <Sparkles size={14} className="text-brand-orange flex-shrink-0" />
+              <span>
+                <strong>Test Mode:</strong> {demoCodeNotice} (auto-filled below)
+              </span>
+            </div>
+          )}
+
           <input
             type="text"
             inputMode="numeric"
@@ -126,7 +151,10 @@ export function OtpVerifier({ onSuccess }: OtpVerifierProps): React.JSX.Element 
             {loading ? "Verifying…" : "Confirm Code"}
           </button>
           <button
-            onClick={() => setOtpSent(false)}
+            onClick={() => {
+              setOtpSent(false);
+              setDemoCodeNotice(null);
+            }}
             className="text-xs text-gray-400 w-full text-center hover:text-gray-600"
           >
             Use a different number

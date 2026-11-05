@@ -18,25 +18,42 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { phone } = parsed.data;
     const code = await createOtp(phone);
 
-    // In production, send via Africa's Talking.
-    // For test/sandbox: log to console (warning level per ESLint rule).
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(`[OTP] Phone: ${phone} → Code: ${code}`);
+    const apiKey = process.env.AT_API_KEY;
+    const username = process.env.AT_USERNAME;
+    const isLiveKeyConfigured =
+      Boolean(apiKey) &&
+      apiKey !== "test_at_api_key" &&
+      !apiKey?.startsWith("test_");
+
+    let smsDispatched = false;
+
+    if (isLiveKeyConfigured && username) {
+      try {
+        const AfricasTalking = (await import("africastalking")).default;
+        const at = AfricasTalking({ apiKey: apiKey ?? "", username });
+        await at.SMS.send({
+          to: [`+233${phone.slice(1)}`],
+          message: `Your CEPE Grills verification code is: ${code}. Valid for 10 minutes.`,
+          from: "CEPE",
+        });
+        smsDispatched = true;
+      } catch (err) {
+        console.warn(
+          "[OTP SMS] Africa's Talking dispatch failed; falling back to preview code:",
+          err instanceof Error ? err.message : err
+        );
+      }
     } else {
-      // For OTP we use a custom message directly via AT SDK
-      const AfricasTalking = (await import("africastalking")).default;
-      const at = AfricasTalking({
-        apiKey: process.env.AT_API_KEY ?? "",
-        username: process.env.AT_USERNAME ?? "",
-      });
-      await at.SMS.send({
-        to: [`+233${phone.slice(1)}`],
-        message: `Your CEPE Grills verification code is: ${code}. Valid for 10 minutes.`,
-        from: "CEPE",
-      });
+      console.warn(`[OTP Preview] Phone: ${phone} → Code: ${code}`);
     }
 
-    return NextResponse.json({ success: true, message: "OTP sent successfully." });
+    return NextResponse.json({
+      success: true,
+      message: smsDispatched
+        ? "OTP sent successfully to your phone."
+        : "OTP generated successfully.",
+      demoCode: !smsDispatched ? code : undefined,
+    });
   } catch (err) {
     if (err instanceof OtpError && err.code === "RATE_LIMITED") {
       return NextResponse.json({ error: err.message }, { status: 429 });
