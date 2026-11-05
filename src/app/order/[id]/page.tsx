@@ -61,16 +61,14 @@ export default function OrderTrackingPage({
   useEffect(() => {
     const token =
       typeof window !== "undefined" ? sessionStorage.getItem("otp_token") : null;
-    if (!token) {
-      setError("Session expired. Please place a new order.");
-      return;
-    }
 
     const fetchOrder = async (): Promise<void> => {
       try {
-        const res = await fetch(`/api/orders/${params.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        const res = await fetch(`/api/orders/${params.id}`, { headers });
         if (!res.ok) throw new Error("Order not found.");
         const data = (await res.json()) as OrderDTO;
         setOrder(data);
@@ -80,7 +78,6 @@ export default function OrderTrackingPage({
     };
 
     void fetchOrder();
-    // Poll every 15 seconds for status updates
     const interval = setInterval(() => void fetchOrder(), 15000);
     return () => clearInterval(interval);
   }, [params.id]);

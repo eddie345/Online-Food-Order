@@ -41,6 +41,9 @@ export function CheckoutPageShell(): React.JSX.Element {
   const handleOtpSuccess = (jwtToken: string, verifiedPhone: string): void => {
     setToken(jwtToken);
     setPhone(verifiedPhone);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("otp_token", jwtToken);
+    }
     setStep("fulfillment");
   };
 
