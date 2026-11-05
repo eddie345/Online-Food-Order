@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum FulfillmentType {
+  DELIVERY
+  PICKUP
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  sortOrder Int
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MenuItem {
+  id            String       @id @default(cuid())
+  name          String
+  description   String?
+  categoryId    String
+  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants      ItemVariant[]
+  availableDays DayOfWeek[]
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([categoryId])
+}
+
+model ItemVariant {
+  id         String      @id @default(cuid())
+  menuItemId String
+  menuItem   MenuItem    @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  label      String      // e.g. "Regular", "Large", "250ml", "500ml", "Single", "Double", "Standard"
+  price      Int         // in pesewas (GHS × 100)
+  orderItems OrderItem[]
+
+  @@index([menuItemId])
+}
+
+model Order {
+  id              String               @id @default(cuid())
+  reference       String               @unique
+  customerPhone   String
+  customerName    String?
+  fulfillmentType FulfillmentType
+  deliveryAddress String?
+  deliveryFee     Int                  @default(0) // pesewas
+  pickupSlot      DateTime?
+  status          OrderStatus          @default(PENDING)
+  totalAmount     Int                  // pesewas (subtotal + deliveryFee)
+  paidAt          DateTime?
+  items           OrderItem[]
+  statusHistory   OrderStatusHistory[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@index([customerPhone])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ItemVariant @relation(fields: [variantId], references: [id])
+  quantity  Int
+  unitPrice Int         // pesewas — snapshot at time of order
+
+  @@index([orderId])
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}
