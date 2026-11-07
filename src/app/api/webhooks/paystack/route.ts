@@ -14,7 +14,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const rawBody = await req.text();
   const signature = req.headers.get("x-paystack-signature") ?? "";
 
-  // 2. Verify HMAC-SHA512 signature — reject immediately if invalid
+  // 2. Verify HMAC-SHA512 signature (reject immediately if invalid)
   let isValid: boolean;
   try {
     isValid = verifyPaystackSignature(rawBody, signature);
@@ -44,11 +44,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // 5. Find the order
   const order = await prisma.order.findUnique({ where: { reference } });
   if (!order) {
-    // Not our order — acknowledge and move on
+    // Not our order: acknowledge and move on
     return NextResponse.json({ received: true });
   }
 
-  // 6. Idempotency — if already PAID, do nothing
+  // 6. Idempotency: if already PAID, do nothing
   if (order.status !== "PENDING") {
     return NextResponse.json({ received: true });
   }

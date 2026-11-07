@@ -1,5 +1,5 @@
 // src/types/index.ts
-// Shared TypeScript types — strictly typed, no `any`
+// Shared TypeScript types - strictly typed, no `any`
 
 import { DayOfWeek, FulfillmentType, OrderStatus } from "@prisma/client";
 
@@ -21,6 +21,7 @@ export interface MenuItemDTO {
   availableDays: DayOfWeek[];
   isAvailableToday: boolean;
   isActive: boolean;
+  imageUrl?: string;
 }
 
 export interface CategoryDTO {

@@ -120,7 +120,7 @@ export function KdsDashboard(): React.JSX.Element {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">🍳 Kitchen Display</h1>
-          <p className="text-gray-400 text-sm">CEPE Grills &amp; Diner — Live Orders</p>
+          <p className="text-gray-400 text-sm">CEPE Grills &amp; Diner - Live Orders</p>
         </div>
         <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${connected ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
           {connected ? "● Live" : "○ Disconnected"}

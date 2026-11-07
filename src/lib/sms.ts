@@ -31,12 +31,12 @@ export type OrderStatusMessage =
 const STATUS_MESSAGES: Record<OrderStatusMessage, string> = {
   PAID: "✅ Your CEPE Grills order is confirmed & being prepared. Thank you!",
   PREPARING:
-    "👨‍🍳 Your CEPE Grills order is now being prepared. Estimated: 20–30 min.",
+    "👨‍🍳 Your CEPE Grills order is now being prepared. Estimated: 20-30 min.",
   READY: "🎉 Your CEPE Grills order is ready for pickup! Please come collect it.",
   OUT_FOR_DELIVERY:
     "🛵 Your CEPE Grills order is on the way! Sit tight.",
   COMPLETED:
-    "🙏 Order delivered. Enjoy your meal! — CEPE Grills & Diner (0243799362)",
+    "🙏 Order delivered. Enjoy your meal! - CEPE Grills & Diner (0243799362)",
 };
 
 /**

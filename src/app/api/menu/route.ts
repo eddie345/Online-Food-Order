@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isItemAvailableToday } from "@/lib/day-lock";
-import { getStaticMenu } from "@/lib/static-menu";
+import { getStaticMenu, findStaticItemImage } from "@/lib/static-menu";
 import { CategoryDTO, MenuItemDTO } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -45,12 +45,13 @@ export async function GET(): Promise<NextResponse> {
         availableDays: item.availableDays,
         isAvailableToday: isItemAvailableToday(item.availableDays, now),
         isActive: item.isActive,
+        imageUrl: findStaticItemImage(item.name),
       })),
     }));
 
     return NextResponse.json(result);
   } catch (err) {
-    // Database connection or table unavailable — fallback seamlessly to static catalog
+    // Database connection or table unavailable; fallback seamlessly to static catalog
     console.warn(
       "[GET /api/menu] Database unavailable; serving static catalog:",
       err instanceof Error ? err.message : err

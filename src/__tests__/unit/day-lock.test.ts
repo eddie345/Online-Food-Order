@@ -95,7 +95,7 @@ describe("isItemAvailableToday", () => {
 
   describe("default date behaviour", () => {
     it("uses the current date when no date is provided", () => {
-      // Smoke test — just verify it does not throw
+      // Smoke test: verify it does not throw
       expect(() => isItemAvailableToday([])).not.toThrow();
     });
   });

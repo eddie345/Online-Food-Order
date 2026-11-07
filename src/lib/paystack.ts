@@ -1,5 +1,5 @@
 // src/lib/paystack.ts
-// Paystack API wrapper — no hardcoded secrets, full type safety.
+// Paystack API wrapper: no hardcoded secrets, full type safety.
 
 import crypto from "crypto";
 import { PaystackInitResponse, PaystackWebhookPayload } from "@/types";

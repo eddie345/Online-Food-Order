@@ -1,5 +1,5 @@
 // src/app/api/orders/[id]/status/route.ts
-// KDS-only endpoint — protected by KDS_SECRET bearer token.
+// KDS-only endpoint (protected by KDS_SECRET bearer token)
 
 import { NextRequest, NextResponse } from "next/server";
 import { OrderStatusUpdateSchema } from "@/schemas/order.schema";

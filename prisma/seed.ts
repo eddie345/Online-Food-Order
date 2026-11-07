@@ -75,7 +75,7 @@ const categories: CategorySeed[] = [
       },
       {
         name: "Loaded Fries (Jumbo)",
-        description: "Fries loaded with your favourite toppings — jumbo size.",
+        description: "Fries loaded with your favourite toppings - jumbo size.",
         variants: [
           { label: "Regular", price: GHS(100) },
           { label: "Large", price: GHS(150) },

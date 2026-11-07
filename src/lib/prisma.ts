@@ -1,5 +1,5 @@
 // src/lib/prisma.ts
-// Singleton Prisma client — prevents connection pool exhaustion in Next.js dev.
+// Singleton Prisma client: prevents connection pool exhaustion in Next.js dev.
 
 import { PrismaClient } from "@prisma/client";
 

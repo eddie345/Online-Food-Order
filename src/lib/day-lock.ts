@@ -1,6 +1,6 @@
 // src/lib/day-lock.ts
 // Pure, deterministic day-of-week availability checker.
-// Written to be trivially testable — no side effects, no I/O.
+// Written to be trivially testable: no side effects, no I/O.
 
 import { DayOfWeek } from "@prisma/client";
 

@@ -39,7 +39,7 @@ const STATUS_INFO: Record<
     color: "text-brand-orange",
   },
   COMPLETED: {
-    label: "Delivered — Enjoy!",
+    label: "Delivered - Enjoy!",
     icon: <span className="text-3xl">🎉</span>,
     color: "text-green-600",
   },

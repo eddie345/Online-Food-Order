@@ -4,10 +4,14 @@ import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
 
 export const metadata: Metadata = {
-  title: "CEPE Grills & Diner — Good Food, Good Vibes",
+  title: "CEPE Grills & Diner - Good Food, Good Vibes",
   description:
     "Order delicious Ghanaian meals online from CEPE Grills & Diner. Rice dishes, loaded plates, smoothies, snacks and more.",
   keywords: ["CEPE Grills", "food ordering", "Ghana", "restaurant", "delivery"],
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

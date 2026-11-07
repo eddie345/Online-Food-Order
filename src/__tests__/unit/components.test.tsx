@@ -7,10 +7,13 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { DayLockBadge } from "@/components/menu/DayLockBadge";
 import { VariantSelector } from "@/components/menu/VariantSelector";
+import { CategoryTabs } from "@/components/menu/CategoryTabs";
+import { MenuItemCard } from "@/components/menu/MenuItemCard";
 import { FulfillmentToggle } from "@/components/checkout/FulfillmentToggle";
 import { DeliveryForm } from "@/components/checkout/DeliveryForm";
+import { CartProvider } from "@/components/cart/CartProvider";
 import { DayOfWeek } from "@prisma/client";
-import { ItemVariantDTO } from "@/types";
+import { ItemVariantDTO, CategoryDTO, MenuItemDTO } from "@/types";
 
 describe("DayLockBadge Component", () => {
   it("renders 'Tuesdays only' badge when available on Tuesday", () => {
@@ -67,6 +70,72 @@ describe("VariantSelector Component", () => {
 
     fireEvent.click(screen.getByText("500ml · GHS 50.00"));
     expect(handleSelect).toHaveBeenCalledWith(secondVariant);
+  });
+});
+
+describe("CategoryTabs Component with Vector Icons", () => {
+  const mockCategories: CategoryDTO[] = [
+    { id: "cat-1", name: "Rice Dishes", sortOrder: 1, items: [] },
+    { id: "cat-2", name: "Loaded Plates", sortOrder: 2, items: [] },
+    { id: "cat-3", name: "Student Saver Menu", sortOrder: 3, items: [] },
+  ];
+
+  it("renders all category tab labels", () => {
+    const handleSelect = jest.fn();
+    render(
+      <CategoryTabs
+        categories={mockCategories}
+        activeCategory="cat-1"
+        onSelect={handleSelect}
+      />
+    );
+
+    expect(screen.getByText("Rice Dishes")).toBeInTheDocument();
+    expect(screen.getByText("Loaded Plates")).toBeInTheDocument();
+    expect(screen.getByText("Student Saver Menu")).toBeInTheDocument();
+  });
+
+  it("triggers onSelect callback when a tab is clicked", () => {
+    const handleSelect = jest.fn();
+    render(
+      <CategoryTabs
+        categories={mockCategories}
+        activeCategory="cat-1"
+        onSelect={handleSelect}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Loaded Plates"));
+    expect(handleSelect).toHaveBeenCalledWith("cat-2");
+  });
+});
+
+describe("MenuItemCard Component with Food Image", () => {
+  const mockItem: MenuItemDTO = {
+    id: "item-1",
+    name: "Assorted Jollof",
+    description: "Classic Ghanaian jollof with rich flavour.",
+    categoryId: "cat-1",
+    categoryName: "Rice Dishes",
+    imageUrl: "https://images.unsplash.com/photo-1662908226065-ef5610ec1f79",
+    availableDays: [],
+    isAvailableToday: true,
+    isActive: true,
+    variants: [{ id: "v-1", label: "Standard", price: 8000 }],
+  };
+
+  it("renders item card with food image, name, and price", () => {
+    render(
+      <CartProvider>
+        <MenuItemCard item={mockItem} />
+      </CartProvider>
+    );
+
+    expect(screen.getByText("Assorted Jollof")).toBeInTheDocument();
+    expect(screen.getByText("GHS 80.00")).toBeInTheDocument();
+    const image = screen.getByRole("img", { name: "Assorted Jollof" });
+    expect(image).toBeInTheDocument();
+    expect(image.getAttribute("src")).toContain(encodeURIComponent("photo-1662908226065"));
   });
 });
 
